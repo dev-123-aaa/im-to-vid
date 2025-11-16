@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Install FFMPEG and required libs
+# Install system deps
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsm6 \
@@ -9,18 +9,20 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (better caching)
-COPY requirements.txt /app/requirements.txt
+# Set working directory
 WORKDIR /app
 
-# Install Python requirements
+# Copy requirements and install
+COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app
-COPY server.py /app/server.py
+# Copy app code
+COPY server.py .
 
+# Ensure PORT env
 ENV PORT=8080
 EXPOSE 8080
 
+# Run Uvicorn
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
