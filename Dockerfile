@@ -6,16 +6,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Python requirements
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app
+# Copy FastAPI app
 COPY server.py /app/server.py
 WORKDIR /app
 
-# Expose port 8080 (Cloud Run default)
+# Expose Cloud Run port
+ENV PORT=8080
 EXPOSE 8080
 
-# Start FastAPI via Uvicorn
+# Start FastAPI app
 CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
